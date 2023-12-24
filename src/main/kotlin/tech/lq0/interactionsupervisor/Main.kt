@@ -16,6 +16,7 @@ class Main : JavaPlugin() {
         log = logger
         with(server.pluginManager) {
             registerEvents(ChatHandler, this@Main)
+            registerEvents(BookHandler, this@Main)
             registerEvents(SignHandler, this@Main)
         }
 

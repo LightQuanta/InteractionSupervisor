@@ -19,6 +19,18 @@ class Main : JavaPlugin() {
         logger.info("InteractionSupervisor Disabled")
     }
 
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+        if (args.isEmpty()) return false
+        when (args[0]) {
+            "reload" -> {
+                loadConfig()
+                sender.sendMessage("已重新加载${keywords.size}条关键词和${regexKeywords.size}条正则")
+            }
+        }
+
+        return true
+    }
+
     private fun loadConfig() {
         keywords.clear()
         regexKeywords.clear()

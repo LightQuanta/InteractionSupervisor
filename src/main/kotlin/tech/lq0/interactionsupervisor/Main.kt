@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import tech.lq0.interactionsupervisor.event.BookHandler
 import tech.lq0.interactionsupervisor.event.ChatHandler
+import tech.lq0.interactionsupervisor.event.SignHandler
 import java.util.logging.Logger
 
 lateinit var log: Logger
@@ -15,6 +16,7 @@ class Main : JavaPlugin() {
         log = logger
         with(server.pluginManager) {
             registerEvents(ChatHandler, this@Main)
+            registerEvents(SignHandler, this@Main)
         }
 
         loadConfig()

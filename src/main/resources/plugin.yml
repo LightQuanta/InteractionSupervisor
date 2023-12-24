@@ -5,8 +5,8 @@ api-version: '1.16'
 authors: [Light_Quanta]
 commands:
   interactionsupervisor:
-    description: §c§l[§bI§mS]§r §bInteraction§mSupervisor
-    usage: §c§l[§bI§mS]§r 用法：/is [reload|ban|unban|banlist|test]
+    description: §7[§bI§4S§7]§r §bInteraction§mSupervisor
+    usage: §7[§bI§4S§7]§r 用法：/is [reload|ban|unban|banlist|test]
     aliases: is
 permissions:
   is.reload:

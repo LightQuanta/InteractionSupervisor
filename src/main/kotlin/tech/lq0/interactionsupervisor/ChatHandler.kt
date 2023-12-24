@@ -7,6 +7,10 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 object ChatHandler : Listener {
     @EventHandler
     fun onChat(event: AsyncPlayerChatEvent) {
-
+        val message = event.message
+        if (message.isSensitive()) {
+            event.player.sendMessage("敏感词汇")
+            event.isCancelled = true
+        }
     }
 }

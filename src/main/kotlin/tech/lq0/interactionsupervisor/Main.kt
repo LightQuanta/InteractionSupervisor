@@ -20,15 +20,15 @@ class Main : JavaPlugin() {
     }
 
     private fun loadConfig() {
-        SensitiveWords.keywords.clear()
-        SensitiveWords.regexKeywords.clear()
+        keywords.clear()
+        regexKeywords.clear()
 
         config.getStringList("keywords").forEach {
-            SensitiveWords.keywords.add(it as String)
+            keywords.add(it as String)
         }
         config.getStringList("regex").forEach {
-            SensitiveWords.regexKeywords.add(Regex(it as String))
+            regexKeywords.add(Regex(it as String))
         }
-        logger.info("Loaded ${SensitiveWords.keywords.size} keyword(s) and ${SensitiveWords.regexKeywords.size} regex keyword(s)")
+        logger.info("Loaded ${keywords.size} keyword(s) and ${regexKeywords.size} regex keyword(s)")
     }
 }

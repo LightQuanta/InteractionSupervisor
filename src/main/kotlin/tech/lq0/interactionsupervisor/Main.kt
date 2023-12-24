@@ -1,5 +1,6 @@
 package tech.lq0.interactionsupervisor
 
+import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
@@ -9,11 +10,13 @@ import tech.lq0.interactionsupervisor.event.SignHandler
 import java.util.logging.Logger
 
 lateinit var log: Logger
+lateinit var svr: Server
 
 @Suppress("unused")
 class Main : JavaPlugin() {
     override fun onEnable() {
         log = logger
+        svr = server
 
         with(server.pluginManager) {
             registerEvents(ChatHandler, this@Main)
@@ -69,6 +72,15 @@ class Main : JavaPlugin() {
             else -> return false
         }
         return true
+    }
+
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        alias: String,
+        args: Array<out String>
+    ): MutableList<String>? {
+        return super.onTabComplete(sender, command, alias, args)
     }
 
     private fun loadConfig() {

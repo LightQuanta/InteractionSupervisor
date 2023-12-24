@@ -3,7 +3,6 @@ package tech.lq0.interactionsupervisor
 import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import tech.lq0.interactionsupervisor.event.BookHandler
 import tech.lq0.interactionsupervisor.event.ChatHandler
@@ -44,7 +43,7 @@ class Main : JavaPlugin() {
 
             "test" -> {
                 if (args.size < 2) return false
-                sender.sendMessage((if (args[1].isSensitive()) "存在敏感词" else "不存在敏感词").withPluginPrefix())
+                sender.sendMessage((if (args[1].isSensitive()) "内容存在敏感词" else "内容不存在敏感词").withPluginPrefix())
             }
 
             "ban" -> {
@@ -81,7 +80,7 @@ class Main : JavaPlugin() {
     ): MutableList<String>? {
         if (args.size == 1) return mutableListOf("reload", "test", "ban", "unban", "banlist")
         return when (args[1]) {
-            "ban" -> (server.onlinePlayers.map { it.name }.toSet() - blacklist.values.toSet()).toMutableList()
+            "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
             "unban" -> blacklist.values.toMutableList()
             else -> null
         }

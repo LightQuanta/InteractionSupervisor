@@ -106,6 +106,7 @@ class Main : JavaPlugin() {
 
         config.getStringList("keywords").forEach { keywords.add(it as String) }
         config.getStringList("regex").forEach { regexKeywords.add(Regex(it as String)) }
+        preprocess = config.getString("preprocess") ?: ""
         logger.info("Loaded ${keywords.size} keyword(s) and ${regexKeywords.size} regex keyword(s)")
     }
 }

@@ -3,3 +3,8 @@ version: '${version}'
 main: tech.lq0.interactionsupervisor.Main
 api-version: '1.16'
 authors: [Light_Quanta]
+commands:
+  interactionsupervisor:
+    description: InteractionSupervisor
+    usage: /interactionsupervisor [command]
+    aliases: is

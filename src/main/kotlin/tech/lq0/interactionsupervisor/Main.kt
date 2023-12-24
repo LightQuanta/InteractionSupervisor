@@ -3,10 +3,14 @@ package tech.lq0.interactionsupervisor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.logging.Logger
+
+lateinit var log: Logger
 
 @Suppress("unused")
 class Main : JavaPlugin() {
     override fun onEnable() {
+        log = logger
         with(server.pluginManager) {
             registerEvents(ChatHandler, this@Main)
         }
@@ -35,12 +39,8 @@ class Main : JavaPlugin() {
         keywords.clear()
         regexKeywords.clear()
 
-        config.getStringList("keywords").forEach {
-            keywords.add(it as String)
-        }
-        config.getStringList("regex").forEach {
-            regexKeywords.add(Regex(it as String))
-        }
+        config.getStringList("keywords").forEach { keywords.add(it as String) }
+        config.getStringList("regex").forEach { regexKeywords.add(Regex(it as String)) }
         logger.info("Loaded ${keywords.size} keyword(s) and ${regexKeywords.size} regex keyword(s)")
     }
 }

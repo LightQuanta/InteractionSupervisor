@@ -8,8 +8,12 @@ object ChatHandler : Listener {
     @EventHandler
     fun onChat(event: AsyncPlayerChatEvent) {
         val message = event.message
+        val player = event.player
         if (message.isSensitive()) {
-            event.player.sendMessage("敏感词汇")
+            log.warning("Sensitive words send by ${event.player.name} : $message")
+
+            // shadow ban
+            player.sendMessage("<${player.displayName}> $message")
             event.isCancelled = true
         }
     }

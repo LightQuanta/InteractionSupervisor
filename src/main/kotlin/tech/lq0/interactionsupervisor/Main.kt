@@ -14,6 +14,7 @@ lateinit var log: Logger
 class Main : JavaPlugin() {
     override fun onEnable() {
         log = logger
+
         with(server.pluginManager) {
             registerEvents(ChatHandler, this@Main)
             registerEvents(BookHandler, this@Main)
@@ -35,8 +36,38 @@ class Main : JavaPlugin() {
                 loadConfig()
                 sender.sendMessage("已加载${keywords.size}条关键词和${regexKeywords.size}条正则")
             }
-        }
 
+            "test" -> {
+                if (args.size < 2) return false
+                sender.sendMessage(if (args[1].isSensitive()) "存在敏感词" else "不存在敏感词")
+            }
+
+            "ban" -> {
+                if (args.size < 2) return false
+                val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
+                    ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
+                player?.let {
+                    it.ban()
+                    sender.sendMessage("已封禁${it.name}")
+                } ?: sender.sendMessage("未找到玩家${args[1]}！")
+            }
+
+            "unban" -> {
+                if (args.size < 2) return false
+                val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
+                    ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
+                player?.let {
+                    it.unban()
+                    sender.sendMessage("已解封${it.name}")
+                } ?: sender.sendMessage("未找到玩家${args[1]}！")
+            }
+
+            "banlist" -> {
+                sender.sendMessage("封禁玩家列表：${blacklist.values.joinToString()}")
+            }
+
+            else -> return false
+        }
         return true
     }
 

@@ -8,3 +8,16 @@ commands:
     description: InteractionSupervisor
     usage: /interactionsupervisor [command]
     aliases: is
+permissions:
+  is.reload:
+    description: Reload InteractionSupervisor
+    default: false
+  is.test:
+    description: Test
+    default: false
+  is.ban:
+    description: Ban
+    default: false
+  is.unban:
+    description: Unban
+    default: false

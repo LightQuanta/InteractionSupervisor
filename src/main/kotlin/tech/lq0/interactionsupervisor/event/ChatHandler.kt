@@ -1,8 +1,10 @@
-package tech.lq0.interactionsupervisor
+package tech.lq0.interactionsupervisor.event
 
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import tech.lq0.interactionsupervisor.isSensitive
+import tech.lq0.interactionsupervisor.log
 
 object ChatHandler : Listener {
     @EventHandler

@@ -3,6 +3,8 @@ package tech.lq0.interactionsupervisor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
+import tech.lq0.interactionsupervisor.event.BookHandler
+import tech.lq0.interactionsupervisor.event.ChatHandler
 import java.util.logging.Logger
 
 lateinit var log: Logger
@@ -28,7 +30,7 @@ class Main : JavaPlugin() {
         when (args[0]) {
             "reload" -> {
                 loadConfig()
-                sender.sendMessage("已重新加载${keywords.size}条关键词和${regexKeywords.size}条正则")
+                sender.sendMessage("已加载${keywords.size}条关键词和${regexKeywords.size}条正则")
             }
         }
 

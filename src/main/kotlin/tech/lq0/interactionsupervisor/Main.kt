@@ -44,7 +44,7 @@ class Main : JavaPlugin() {
             "test" -> {
                 if (args.size < 2) return false
                 sender.sendMessage(
-                    (if (args.drop(2).joinToString(" ").isSensitive()) {
+                    (if (args.drop(1).joinToString(" ").isSensitive()) {
                         "内容存在敏感词"
                     } else {
                         "内容不存在敏感词"

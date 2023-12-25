@@ -4,6 +4,7 @@ var chatDelayEnabled = false
 var chatDelay = 5
 var chatFormat = "§r<%DISPLAY_NAME%>§r %MESSAGE%"
 var senderReceiveImmediately = false
+var opReceiveImmediately = true
 
 var preprocess = ""
 val normalKeywords = mutableListOf<String>()

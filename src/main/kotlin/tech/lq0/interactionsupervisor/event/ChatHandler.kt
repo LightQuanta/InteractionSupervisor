@@ -30,8 +30,8 @@ object ChatHandler : Listener {
                         .replace("%NAME%", player.name)
                         .replace("%MESSAGE%", message)
                 )
-                if (senderReceiveImmediately) {
-                    player.sendMessage(
+                svr.onlinePlayers.filter { canBypassDelay(it, chat) }.forEach {
+                    it.sendMessage(
                         chatFormat
                             .replace("%DISPLAY_NAME%", player.displayName)
                             .replace("%NAME%", player.name)
@@ -39,7 +39,7 @@ object ChatHandler : Listener {
                     )
                 }
                 delay(chatDelay * 1000L)
-                sendChatMessage(uuid)
+                sendDelayedChat(uuid)
             }
             event.isCancelled = true
             return
@@ -72,7 +72,13 @@ object ChatHandler : Listener {
 
     fun clearDelayedMessage(): Int = delayedChat.size.also { delayedChat.clear() }
 
-    private fun sendChatMessage(uuid: UUID) {
+    private fun canBypassDelay(player: Player, chat: ChatMessage): Boolean {
+        if (player.uniqueId == chat.player.uniqueId && senderReceiveImmediately)
+            return true
+        return opReceiveImmediately && player.isOp
+    }
+
+    private fun sendDelayedChat(uuid: UUID) {
         if (delayedChat.contains(uuid)) {
             val chatInfo = delayedChat[uuid]!!
             val player = chatInfo.player
@@ -85,15 +91,13 @@ object ChatHandler : Listener {
                         .replace("%MESSAGE%", message)
                 )
             } else {
-                svr.onlinePlayers.forEach {
-                    if (!(it == player && senderReceiveImmediately)) {
-                        it.sendMessage(
-                            chatFormat
-                                .replace("%DISPLAY_NAME%", player.displayName)
-                                .replace("%NAME%", player.name)
-                                .replace("%MESSAGE%", message)
-                        )
-                    }
+                svr.onlinePlayers.filter { !canBypassDelay(it, chatInfo) }.forEach {
+                    it.sendMessage(
+                        chatFormat
+                            .replace("%DISPLAY_NAME%", player.displayName)
+                            .replace("%NAME%", player.name)
+                            .replace("%MESSAGE%", message)
+                    )
                 }
             }
         }

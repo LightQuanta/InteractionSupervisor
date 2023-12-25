@@ -15,3 +15,6 @@ chat-format: "§r<%DISPLAY_NAME%>§r %MESSAGE%"
 
 # 是否允许发送者立刻收到自己发送的消息，而不受延迟影响
 sender-receive-immediately: false
+
+# 是否允许管理员立刻收到自己发送的消息，而不受延迟影响
+op-receive-immediately: true

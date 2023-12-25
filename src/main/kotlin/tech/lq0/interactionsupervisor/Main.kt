@@ -157,6 +157,7 @@ class Main : JavaPlugin() {
             chatDelay = getInt("chat-delay").coerceIn(1..300)
             chatFormat = getString("chat-format") ?: ""
             senderReceiveImmediately = getBoolean("sender-receive-immediately")
+            opReceiveImmediately = getBoolean("op-receive-immediately")
         }
 
         with(loadOrCreateConfig("sensitive.yml")) {

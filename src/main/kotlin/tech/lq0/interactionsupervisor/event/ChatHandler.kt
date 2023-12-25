@@ -52,7 +52,12 @@ object ChatHandler : Listener {
             log.warning("Sensitive words send by ${event.player.name} : $message")
             player.shadowBan()
             // shadow ban
-            player.sendMessage("<${player.displayName}> $message")
+            player.sendMessage(
+                chatFormat
+                    .replace("%DISPLAY_NAME%", player.displayName)
+                    .replace("%NAME%", player.name)
+                    .replace("%MESSAGE%", message)
+            )
             event.isCancelled = true
         }
     }

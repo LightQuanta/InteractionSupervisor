@@ -1,13 +1,16 @@
 package tech.lq0.interactionsupervisor
 
+import com.google.common.base.Charsets
 import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import tech.lq0.interactionsupervisor.event.BookHandler
 import tech.lq0.interactionsupervisor.event.ChatHandler
 import tech.lq0.interactionsupervisor.event.SignHandler
 import java.io.File
+import java.io.InputStreamReader
 import java.util.logging.Logger
 
 lateinit var log: Logger
@@ -136,19 +139,34 @@ class Main : JavaPlugin() {
         regexpKeywords.clear()
 
         dataFolder.mkdirs()
-        val file = File(dataFolder, "config.yml")
-        if (file.exists()) {
-            config.load(file)
-        } else {
-            config.save(file)
+        with(loadOrCreateConfig("config.yml")) {
+            chatDelayEnabled = getBoolean("chat-delay-enabled")
+            chatDelay = getInt("chat-delay").coerceIn(1..300)
+            chatFormat = getString("chat-format") ?: ""
         }
 
-        chatDelayEnabled = config.getBoolean("chat-delay-enabled")
-        chatDelay = config.getInt("chat-delay").coerceIn(1..300)
-        chatFormat = config.getString("chat-format") ?: ""
-        config.getStringList("keywords").forEach { normalKeywords.add(it as String) }
-        config.getStringList("regex").forEach { regexpKeywords.add(Regex(it as String)) }
-        preprocess = config.getString("preprocess") ?: ""
+        with(loadOrCreateConfig("sensitive.yml")) {
+            getStringList("keywords").forEach { normalKeywords.add(it as String) }
+            getStringList("regex").forEach { regexpKeywords.add(Regex(it as String)) }
+            preprocess = getString("preprocess") ?: ""
+        }
+
         logger.info("Loaded ${normalKeywords.size} keyword(s) and ${regexpKeywords.size} regex keyword(s)")
+    }
+
+    private fun loadOrCreateConfig(name: String): YamlConfiguration {
+        val f = File(dataFolder, name)
+        return if (f.exists()) {
+            val newConfig = YamlConfiguration.loadConfiguration(f)
+            getResource("config/$name")?.let {
+                newConfig.setDefaults(YamlConfiguration.loadConfiguration(InputStreamReader(it, Charsets.UTF_8)))
+            }
+            newConfig
+        } else {
+            getResource("config/$name")?.let {
+                YamlConfiguration.loadConfiguration(InputStreamReader(it, Charsets.UTF_8))
+                    .also { conf -> conf.save(f) }
+            } ?: throw Exception("config file $name not found")
+        }
     }
 }

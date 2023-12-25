@@ -1,0 +1,14 @@
+# 示例配置 by Light_Quanta
+
+# 聊天延迟设置
+# 启用后，将会在每次聊天发送前，延迟一定时间再发送
+chat-delay-enabled: false
+# 延迟时间（单位：秒）
+chat-delay: 5
+
+# 聊天格式
+# 用于shadow ban时伪装正常聊天，以及启用聊天延迟时模拟正常聊天内容
+# %DISPLAY_NAME%：玩家显示名
+# %NAME%：玩家名称
+# %MESSAGE%：聊天内容
+chat-format: "§r<%DISPLAY_NAME%>§r %MESSAGE%"

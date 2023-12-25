@@ -85,24 +85,35 @@ class Main : JavaPlugin() {
                 }
             }
 
-            "enabledelay" -> {
-                chatDelayEnabled = true
-                sender.sendMessage("已启用消息延迟".withPluginPrefix())
-            }
-
-            "disabledelay" -> {
-                chatDelayEnabled = false
-                sender.sendMessage("已禁用消息延迟".withPluginPrefix())
-            }
-
             "delay" -> {
-                if (args.size < 2) {
-                    sender.sendMessage("当前延迟为${chatDelay}秒".withPluginPrefix())
-                    return true
+                with(loadOrCreateConfig("config.yml")) {
+                    when (args[1]) {
+                        "info" -> sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
+                        "enable" -> {
+                            chatDelayEnabled = true
+                            set("chat-delay-enabled", true)
+                            save(File(dataFolder, "config.yml"))
+                            sender.sendMessage("已启用消息延迟".withPluginPrefix())
+                        }
+
+                        "disable" -> {
+                            chatDelayEnabled = false
+                            set("chat-delay-enabled", false)
+                            save(File(dataFolder, "config.yml"))
+                            sender.sendMessage("已禁用消息延迟".withPluginPrefix())
+                        }
+
+                        "set" -> {
+                            chatDelay = args.getOrNull(2)?.toIntOrNull()?.coerceIn(1..300) ?: return false
+                            set("chat-delay", chatDelay)
+                            save(File(dataFolder, "config.yml"))
+                            log.info("Set chat delay to $chatDelay second(s)")
+                            sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
+                        }
+
+                        else -> return false
+                    }
                 }
-                chatDelay = args[1].toIntOrNull()?.coerceIn(1..300) ?: return false
-                log.info("Set chat delay to $chatDelay second(s)")
-                sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
             }
 
             else -> return false
@@ -123,15 +134,17 @@ class Main : JavaPlugin() {
             "unban",
             "banlist",
             "clear",
-            "enabledelay",
-            "disabledelay",
             "delay"
         )
-        return when (args[1]) {
-            "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
-            "unban" -> blacklist.values.toMutableList()
-            else -> null
+        if (args.size == 2) {
+            return when (args[0]) {
+                "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
+                "unban" -> blacklist.values.toMutableList()
+                "delay" -> mutableListOf("info", "enable", "disable", "set")
+                else -> null
+            }
         }
+        return null
     }
 
     private fun loadConfig() {

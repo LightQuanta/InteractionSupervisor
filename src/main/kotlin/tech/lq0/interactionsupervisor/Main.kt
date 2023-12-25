@@ -39,6 +39,9 @@ class Main : JavaPlugin() {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (args.isEmpty()) return false
+
+        // TODO 修改为正确的权限判断
+        if (!sender.isOp) return false
         when (args[0]) {
             "reload" -> {
                 loadConfig()

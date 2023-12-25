@@ -11,13 +11,22 @@ commands:
 permissions:
   is.reload:
     description: Reload InteractionSupervisor
-    default: false
+    default: op
   is.test:
     description: Test
-    default: false
+    default: op
   is.ban:
     description: Ban
-    default: false
+    default: op
   is.unban:
     description: Unban
-    default: false
+    default: op
+  is.banlist:
+    description: Banlist
+    default: op
+  is.delay:
+    description: Delay
+    default: op
+  is.clear:
+    description: Clear
+    default: op

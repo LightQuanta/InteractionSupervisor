@@ -97,7 +97,7 @@ class Main : JavaPlugin() {
                     sender.sendMessage("当前延迟为${chatDelay}秒".withPluginPrefix())
                     return true
                 }
-                chatDelay = args[1].toInt().coerceIn(1..300)
+                chatDelay = args[1].toIntOrNull()?.coerceIn(1..300) ?: return false
                 log.info("Set chat delay to $chatDelay second(s)")
                 sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
             }

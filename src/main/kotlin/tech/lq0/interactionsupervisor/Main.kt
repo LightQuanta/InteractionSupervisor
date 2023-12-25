@@ -38,7 +38,7 @@ class Main : JavaPlugin() {
         when (args[0]) {
             "reload" -> {
                 loadConfig()
-                sender.sendMessage("已加载${keywords.size}条关键词和${regexKeywords.size}条正则".withPluginPrefix())
+                sender.sendMessage("已加载${normalKeywords.size}条关键词和${regexpKeywords.size}条正则".withPluginPrefix())
             }
 
             "test" -> {
@@ -57,7 +57,7 @@ class Main : JavaPlugin() {
                 val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
                     ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
                 player?.let {
-                    it.ban()
+                    it.shadowBan()
                     sender.sendMessage("已封禁${it.name}".withPluginPrefix())
                 } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
             }
@@ -67,12 +67,41 @@ class Main : JavaPlugin() {
                 val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
                     ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
                 player?.let {
-                    it.unban()
+                    it.unShadowBan()
                     sender.sendMessage("已解封${it.name}".withPluginPrefix())
                 } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
             }
 
             "banlist" -> sender.sendMessage("封禁玩家列表：${blacklist.values.joinToString()}".withPluginPrefix())
+
+            "clear" -> {
+                if (chatDelayEnabled) {
+                    sender.sendMessage("已清空${ChatHandler.clearDelayedMessage()}条未发送消息".withPluginPrefix())
+                } else {
+                    sender.sendMessage("未启用消息延迟！".withPluginPrefix())
+                }
+            }
+
+            "enabledelay" -> {
+                chatDelayEnabled = true
+                sender.sendMessage("已启用消息延迟".withPluginPrefix())
+            }
+
+            "disabledelay" -> {
+                chatDelayEnabled = false
+                sender.sendMessage("已禁用消息延迟".withPluginPrefix())
+            }
+
+            "delay" -> {
+                if (args.size < 2) {
+                    sender.sendMessage("当前延迟为${chatDelay}秒".withPluginPrefix())
+                    return true
+                }
+                chatDelay = args[1].toInt().coerceIn(1..300)
+                log.info("Set chat delay to $chatDelay second(s)")
+                sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
+            }
+
             else -> return false
         }
         return true
@@ -84,7 +113,17 @@ class Main : JavaPlugin() {
         alias: String,
         args: Array<out String>
     ): MutableList<String>? {
-        if (args.size == 1) return mutableListOf("reload", "test", "ban", "unban", "banlist")
+        if (args.size == 1) return mutableListOf(
+            "reload",
+            "test",
+            "ban",
+            "unban",
+            "banlist",
+            "clear",
+            "enabledelay",
+            "disabledelay",
+            "delay"
+        )
         return when (args[1]) {
             "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
             "unban" -> blacklist.values.toMutableList()
@@ -93,8 +132,8 @@ class Main : JavaPlugin() {
     }
 
     private fun loadConfig() {
-        keywords.clear()
-        regexKeywords.clear()
+        normalKeywords.clear()
+        regexpKeywords.clear()
 
         dataFolder.mkdirs()
         val file = File(dataFolder, "config.yml")
@@ -104,9 +143,12 @@ class Main : JavaPlugin() {
             config.save(file)
         }
 
-        config.getStringList("keywords").forEach { keywords.add(it as String) }
-        config.getStringList("regex").forEach { regexKeywords.add(Regex(it as String)) }
+        chatDelayEnabled = config.getBoolean("chat-delay-enabled")
+        chatDelay = config.getInt("chat-delay").coerceIn(1..300)
+        chatFormat = config.getString("chat-format") ?: ""
+        config.getStringList("keywords").forEach { normalKeywords.add(it as String) }
+        config.getStringList("regex").forEach { regexpKeywords.add(Regex(it as String)) }
         preprocess = config.getString("preprocess") ?: ""
-        logger.info("Loaded ${keywords.size} keyword(s) and ${regexKeywords.size} regex keyword(s)")
+        logger.info("Loaded ${normalKeywords.size} keyword(s) and ${regexpKeywords.size} regex keyword(s)")
     }
 }

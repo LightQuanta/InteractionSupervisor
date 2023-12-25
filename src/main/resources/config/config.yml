@@ -13,8 +13,15 @@ chat-delay: 5
 # %MESSAGE%：聊天内容
 chat-format: "§r<%DISPLAY_NAME%>§r %MESSAGE%"
 
+# 是否启用聊天延迟白名单，只有白名单内的玩家不会跳过消息延迟
+chat-delay-whitelist-enabled: false
+
+#  启用聊天延迟白名单后在这里填写玩家列表，格式：玩家名:UUID
+chat-delay-whitelist:
+#  - "Light_Quanta:377de36f-c5f6-4ae9-98b7-3761550b4127"
+
 # 是否允许发送者立刻收到自己发送的消息，而不受延迟影响
-sender-receive-immediately: false
+sender-receive-immediately: true
 
 # 是否允许管理员立刻收到自己发送的消息，而不受延迟影响
 op-receive-immediately: true

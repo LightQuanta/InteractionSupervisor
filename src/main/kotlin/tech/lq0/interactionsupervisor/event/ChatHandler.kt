@@ -100,10 +100,22 @@ object ChatHandler : Listener {
     // 清空延迟发送消息列表，并返回清空数量
     fun clearDelayedMessage(): Int = delayedChat.size.also { delayedChat.clear() }
 
+    // 检测玩家能否绕过消息延迟
     private fun canBypassDelay(player: Player, chat: ChatMessage): Boolean {
+        // 若启用发送者立刻收到消息，则允许发送者绕过
         if (player.uniqueId == chat.player.uniqueId && senderReceiveImmediately)
             return true
-        return opReceiveImmediately && player.isOp
+        // 若启用管理员立刻收到消息，则允许管理员绕过
+        if (opReceiveImmediately && player.isOp)
+            return true
+
+        // 若启用聊天延迟白名单，则允许发送者以外的人绕过
+        if (chatDelayWhitelistEnabled) {
+            if (player.uniqueId == chat.player.uniqueId && senderReceiveImmediately)
+                return true
+            return player.uniqueId !in chatDelayWhitelist.map { it.uuid }.toSet()
+        }
+        return false
     }
 
     private fun sendDelayedChat(uuid: UUID) {

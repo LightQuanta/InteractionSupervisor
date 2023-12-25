@@ -11,6 +11,7 @@ import tech.lq0.interactionsupervisor.event.ChatHandler
 import tech.lq0.interactionsupervisor.event.SignHandler
 import java.io.File
 import java.io.InputStreamReader
+import java.util.*
 import java.util.logging.Logger
 
 lateinit var log: Logger
@@ -150,6 +151,7 @@ class Main : JavaPlugin() {
     private fun loadConfig() {
         normalKeywords.clear()
         regexpKeywords.clear()
+        chatDelayWhitelist.clear()
 
         dataFolder.mkdirs()
         with(loadOrCreateConfig("config.yml")) {
@@ -158,6 +160,9 @@ class Main : JavaPlugin() {
             chatFormat = getString("chat-format") ?: ""
             senderReceiveImmediately = getBoolean("sender-receive-immediately")
             opReceiveImmediately = getBoolean("op-receive-immediately")
+            chatDelayWhitelistEnabled = getBoolean("chat-delay-whitelist-enabled")
+            getStringList("chat-delay-whitelist").map { it.split(":") }
+                .forEach { (a, b) -> chatDelayWhitelist.add(PlayerUUID(a, UUID.fromString(b))) }
         }
 
         with(loadOrCreateConfig("sensitive.yml")) {

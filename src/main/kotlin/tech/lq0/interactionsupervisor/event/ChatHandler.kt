@@ -30,6 +30,14 @@ object ChatHandler : Listener {
                         .replace("%NAME%", player.name)
                         .replace("%MESSAGE%", message)
                 )
+                if (senderReceiveImmediately) {
+                    player.sendMessage(
+                        chatFormat
+                            .replace("%DISPLAY_NAME%", player.displayName)
+                            .replace("%NAME%", player.name)
+                            .replace("%MESSAGE%", message)
+                    )
+                }
                 delay(chatDelay * 1000L)
                 sendChatMessage(uuid)
             }
@@ -69,7 +77,7 @@ object ChatHandler : Listener {
             val chatInfo = delayedChat[uuid]!!
             val player = chatInfo.player
             val message = chatInfo.message
-            if (player.shadowBanned()) {
+            if (player.shadowBanned() && !senderReceiveImmediately) {
                 player.sendMessage(
                     chatFormat
                         .replace("%DISPLAY_NAME%", player.displayName)
@@ -78,12 +86,14 @@ object ChatHandler : Listener {
                 )
             } else {
                 svr.onlinePlayers.forEach {
-                    it.sendMessage(
-                        chatFormat
-                            .replace("%DISPLAY_NAME%", player.displayName)
-                            .replace("%NAME%", player.name)
-                            .replace("%MESSAGE%", message)
-                    )
+                    if (!(it == player && senderReceiveImmediately)) {
+                        it.sendMessage(
+                            chatFormat
+                                .replace("%DISPLAY_NAME%", player.displayName)
+                                .replace("%NAME%", player.name)
+                                .replace("%MESSAGE%", message)
+                        )
+                    }
                 }
             }
         }

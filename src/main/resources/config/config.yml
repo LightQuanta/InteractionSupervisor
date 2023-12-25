@@ -12,3 +12,6 @@ chat-delay: 5
 # %NAME%：玩家名称
 # %MESSAGE%：聊天内容
 chat-format: "§r<%DISPLAY_NAME%>§r %MESSAGE%"
+
+# 是否允许发送者立刻收到自己发送的消息，而不受延迟影响
+sender-receive-immediately: false

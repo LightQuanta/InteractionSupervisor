@@ -90,27 +90,25 @@ class Main : JavaPlugin() {
             }
 
             "delay" -> {
-                with(loadOrCreateConfig("config.yml")) {
-                    when (args[1]) {
-                        "info" -> sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
-                        "enable" -> {
-                            chatDelayEnabled = true
-                            sender.sendMessage("已启用消息延迟".withPluginPrefix())
-                        }
-
-                        "disable" -> {
-                            chatDelayEnabled = false
-                            sender.sendMessage("已禁用消息延迟".withPluginPrefix())
-                        }
-
-                        "set" -> {
-                            chatDelay = args.getOrNull(2)?.toIntOrNull()?.coerceIn(1..300) ?: return false
-                            log.info("Set chat delay to $chatDelay second(s)")
-                            sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
-                        }
-
-                        else -> return false
+                when (args[1]) {
+                    "info" -> sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
+                    "enable" -> {
+                        chatDelayEnabled = true
+                        sender.sendMessage("已启用消息延迟".withPluginPrefix())
                     }
+
+                    "disable" -> {
+                        chatDelayEnabled = false
+                        sender.sendMessage("已禁用消息延迟".withPluginPrefix())
+                    }
+
+                    "set" -> {
+                        chatDelay = args.getOrNull(2)?.toIntOrNull()?.coerceIn(1..300) ?: return false
+                        log.info("Set chat delay to $chatDelay second(s)")
+                        sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
+                    }
+
+                    else -> return false
                 }
             }
 

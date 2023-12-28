@@ -97,7 +97,7 @@ class Main : JavaPlugin() {
         }
 
         group("delay") {
-            usage = "用法：/is delay [enable|disable|status|set]".trimIndent().withFullPluginPrefix()
+            usage = "用法：/is delay [enable|disable|status|set]".withFullPluginPrefix()
             command("enable") {
                 execute = { sender, _, _, _ ->
                     chatDelayEnabled = true
@@ -154,11 +154,11 @@ class Main : JavaPlugin() {
         // TODO 修改为正确的权限判断
         if (!sender.isOp) return false
 
-        val er = commands.process(sender, command, label, args)
+        val result = commands.process(sender, command, label, args)
         when {
-            er.success -> return true
-            er.usage != null -> {
-                sender.sendMessage(er.usage)
+            result.success -> return true
+            result.usage != null -> {
+                sender.sendMessage(result.usage)
                 return true
             }
 
@@ -191,8 +191,8 @@ class Main : JavaPlugin() {
         }
 
         with(loadOrCreateConfig("sensitive.yml")) {
-            getStringList("keywords").forEach { normalKeywords.add(it as String) }
-            getStringList("regex").forEach { regexpKeywords.add(Regex(it as String)) }
+            getStringList("keywords").forEach { normalKeywords.add(it) }
+            getStringList("regex").forEach { regexpKeywords.add(Regex(it)) }
             preprocess = getString("preprocess") ?: ""
         }
 

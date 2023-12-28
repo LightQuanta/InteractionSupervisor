@@ -19,12 +19,7 @@ class Commands(private val executable: List<Executable>) {
         return when {
             // 执行成功
             commandInfo.command != null -> {
-                commandInfo.command.execute?.invoke(
-                    sender,
-                    command,
-                    label,
-                    args.drop(commandInfo.depth)
-                )
+                commandInfo.command.execute?.invoke(sender, command, label, args.drop(commandInfo.depth))
                 ExecuteResult(true)
             }
 

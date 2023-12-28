@@ -34,11 +34,11 @@ class Main : JavaPlugin() {
 
         command("test") {
             execute = { sender, _, _, args ->
-                if (args.size < 2) {
+                if (args.isEmpty()) {
                     sender.sendMessage("使用方法: /is test <关键词>".withFullPluginPrefix())
                 } else {
                     sender.sendMessage(
-                        (if (args.drop(1).joinToString(" ").isSensitive()) {
+                        (if (args.joinToString(" ").isSensitive()) {
                             "内容存在敏感词"
                         } else {
                             "内容不存在敏感词"

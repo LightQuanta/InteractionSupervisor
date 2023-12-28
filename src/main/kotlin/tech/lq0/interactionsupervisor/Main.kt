@@ -53,8 +53,8 @@ class Main : JavaPlugin() {
                 if (args.isEmpty()) {
                     sender.sendMessage("用法: /is ban <玩家名>".withPluginPrefix())
                 } else {
-                    val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
-                        ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
+                    val player = server.onlinePlayers.firstOrNull { it.name == args[0] }
+                        ?: server.offlinePlayers.firstOrNull { it.name == args[0] }
                     player?.let {
                         it.shadowBan()
                         sender.sendMessage("已封禁${it.name}".withPluginPrefix())
@@ -69,8 +69,8 @@ class Main : JavaPlugin() {
                 if (args.isEmpty()) {
                     sender.sendMessage("用法: /is unban <玩家名>".withPluginPrefix())
                 } else {
-                    val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
-                        ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
+                    val player = server.onlinePlayers.firstOrNull { it.name == args[0] }
+                        ?: server.offlinePlayers.firstOrNull { it.name == args[0] }
                     player?.let {
                         it.unShadowBan()
                         sender.sendMessage("已解封${it.name}".withPluginPrefix())

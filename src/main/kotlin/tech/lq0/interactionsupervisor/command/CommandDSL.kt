@@ -36,13 +36,14 @@ class Commands(private val executable: List<Executable>) {
         val arg = args.dropLast(1)
         if (arg.isEmpty()) return executable.map { it.name }.toMutableList()
 
-        // TODO 实现命令补全
         var lastList = executable
         for (i in 0..arg.lastIndex) {
-            val cmd = lastList.firstOrNull { it is CommandGroup && it.name == args[i] }
-            (cmd as? CommandGroup)?.let {
-                lastList = cmd.subCommands
-            } ?: return mutableListOf()
+            val cmd = lastList.firstOrNull { it.name == args[i] }
+            when (cmd) {
+                is CommandGroup -> lastList = cmd.subCommands
+                is Command -> return cmd.tabComplete()
+                else -> break
+            }
         }
         return mutableListOf(*lastList.map { it.name }.toTypedArray())
     }
@@ -64,7 +65,7 @@ class Commands(private val executable: List<Executable>) {
 
 class Command(commandName: String) : Executable(commandName) {
     var usage: String? = null
-    var getTabList: (() -> MutableList<String>)? = null
+    var tabComplete: (() -> MutableList<String>) = { mutableListOf() }
     var execute: ((CommandSender, org.bukkit.command.Command, String, List<String>) -> Unit)? = null
 }
 

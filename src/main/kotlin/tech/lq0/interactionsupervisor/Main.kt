@@ -61,6 +61,7 @@ class Main : JavaPlugin() {
                     } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
                 }
             }
+            tabComplete = { server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList() }
         }
 
         command("unban") {
@@ -76,6 +77,7 @@ class Main : JavaPlugin() {
                     } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
                 }
             }
+            tabComplete = blacklist.values::toMutableList
         }
 
         command("banlist") {
@@ -101,6 +103,7 @@ class Main : JavaPlugin() {
                     chatDelayEnabled = true
                     sender.sendMessage("已启用消息延迟".withPluginPrefix())
                 }
+                tabComplete = { mutableListOf("5", "10", "20", "30", "60") }
             }
 
             command("disable") {
@@ -168,19 +171,7 @@ class Main : JavaPlugin() {
         command: Command,
         alias: String,
         args: Array<out String>
-    ): MutableList<String> {
-        return commands.tabComplete(args)
-
-//        if (args.size == 2) {
-//            return when (args[0]) {
-//                "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
-//                "unban" -> blacklist.values.toMutableList()
-//                "delay" -> mutableListOf("info", "enable", "disable", "set")
-//                else -> null
-//            }
-//        }
-//        return null
-    }
+    ): MutableList<String> = commands.tabComplete(args)
 
     private fun loadConfig() {
         normalKeywords.clear()

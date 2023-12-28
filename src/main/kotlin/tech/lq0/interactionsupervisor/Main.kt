@@ -6,6 +6,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
+import tech.lq0.interactionsupervisor.command.buildCommand
 import tech.lq0.interactionsupervisor.event.BookHandler
 import tech.lq0.interactionsupervisor.event.ChatHandler
 import tech.lq0.interactionsupervisor.event.SignHandler
@@ -18,9 +19,118 @@ lateinit var log: Logger
 lateinit var svr: Server
 
 fun String.withPluginPrefix() = "§7[§bI§4S§7]§r $this"
+fun String.withFullPluginPrefix() = "§7[§bInteraction§4Supervisor§7]§r\n$this"
 
 @Suppress("unused")
 class Main : JavaPlugin() {
+
+    private val commands = buildCommand {
+        command("reload") {
+            execute = { sender, _, _, _ ->
+                loadConfig()
+                sender.sendMessage("已加载${normalKeywords.size}条关键词和${regexpKeywords.size}条正则".withPluginPrefix())
+            }
+        }
+
+        command("test") {
+            execute = { sender, _, _, args ->
+                if (args.size < 2) {
+                    sender.sendMessage("使用方法: /is test <关键词>".withFullPluginPrefix())
+                } else {
+                    sender.sendMessage(
+                        (if (args.drop(1).joinToString(" ").isSensitive()) {
+                            "内容存在敏感词"
+                        } else {
+                            "内容不存在敏感词"
+                        }).withPluginPrefix()
+                    )
+                }
+            }
+        }
+
+        command("ban") {
+            execute = { sender, _, _, args ->
+                if (args.isEmpty()) {
+                    sender.sendMessage("用法: /is ban <玩家名>".withPluginPrefix())
+                } else {
+                    val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
+                        ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
+                    player?.let {
+                        it.shadowBan()
+                        sender.sendMessage("已封禁${it.name}".withPluginPrefix())
+                    } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
+                }
+            }
+        }
+
+        command("unban") {
+            execute = { sender, _, _, args ->
+                if (args.isEmpty()) {
+                    sender.sendMessage("用法: /is unban <玩家名>".withPluginPrefix())
+                } else {
+                    val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
+                        ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
+                    player?.let {
+                        it.unShadowBan()
+                        sender.sendMessage("已解封${it.name}".withPluginPrefix())
+                    } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
+                }
+            }
+        }
+
+        command("banlist") {
+            execute = { sender, _, _, _ ->
+                sender.sendMessage("封禁玩家列表：${blacklist.values.joinToString()}".withPluginPrefix())
+            }
+        }
+
+        command("clear") {
+            execute = { sender, _, _, _ ->
+                if (chatDelayEnabled) {
+                    sender.sendMessage("已清空${ChatHandler.clearDelayedMessage()}条未发送消息".withPluginPrefix())
+                } else {
+                    sender.sendMessage("未启用消息延迟！".withPluginPrefix())
+                }
+            }
+        }
+
+        group("delay") {
+            usage = "用法：/is delay [enable|disable|status|set]".trimIndent().withFullPluginPrefix()
+            command("enable") {
+                execute = { sender, _, _, _ ->
+                    chatDelayEnabled = true
+                    sender.sendMessage("已启用消息延迟".withPluginPrefix())
+                }
+            }
+
+            command("disable") {
+                execute = { sender, _, _, _ ->
+                    chatDelayEnabled = false
+                    sender.sendMessage("已禁用消息延迟".withPluginPrefix())
+                }
+            }
+
+            command("status") {
+                execute = { sender, _, _, _ ->
+                    sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
+                }
+            }
+
+            command("set") {
+                execute = { sender, _, _, args ->
+                    val delay = args.getOrNull(0)?.toIntOrNull()?.coerceIn(1..300)
+                    if (delay != null) {
+                        chatDelay = delay
+                        log.info("Set chat delay to $chatDelay second(s)")
+                        sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
+                    } else {
+                        sender.sendMessage("消息延迟范围应设置为1-300秒！".withPluginPrefix())
+                    }
+                }
+            }
+        }
+    }
+
     override fun onEnable() {
         log = logger
         svr = server
@@ -38,83 +148,19 @@ class Main : JavaPlugin() {
     override fun onDisable() = logger.info("InteractionSupervisor Disabled")
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        if (args.isEmpty()) return false
-
         // TODO 修改为正确的权限判断
         if (!sender.isOp) return false
-        when (args[0]) {
-            "reload" -> {
-                loadConfig()
-                sender.sendMessage("已加载${normalKeywords.size}条关键词和${regexpKeywords.size}条正则".withPluginPrefix())
-            }
 
-            "test" -> {
-                if (args.size < 2) return false
-                sender.sendMessage(
-                    (if (args.drop(1).joinToString(" ").isSensitive()) {
-                        "内容存在敏感词"
-                    } else {
-                        "内容不存在敏感词"
-                    }).withPluginPrefix()
-                )
-            }
-
-            "ban" -> {
-                if (args.size < 2) return false
-                val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
-                    ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
-                player?.let {
-                    it.shadowBan()
-                    sender.sendMessage("已封禁${it.name}".withPluginPrefix())
-                } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
-            }
-
-            "unban" -> {
-                if (args.size < 2) return false
-                val player = server.onlinePlayers.firstOrNull { it.name == args[1] }
-                    ?: server.offlinePlayers.firstOrNull { it.name == args[1] }
-                player?.let {
-                    it.unShadowBan()
-                    sender.sendMessage("已解封${it.name}".withPluginPrefix())
-                } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
-            }
-
-            "banlist" -> sender.sendMessage("封禁玩家列表：${blacklist.values.joinToString()}".withPluginPrefix())
-
-            "clear" -> {
-                if (chatDelayEnabled) {
-                    sender.sendMessage("已清空${ChatHandler.clearDelayedMessage()}条未发送消息".withPluginPrefix())
-                } else {
-                    sender.sendMessage("未启用消息延迟！".withPluginPrefix())
-                }
-            }
-
-            "delay" -> {
-                when (args[1]) {
-                    "info" -> sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
-                    "enable" -> {
-                        chatDelayEnabled = true
-                        sender.sendMessage("已启用消息延迟".withPluginPrefix())
-                    }
-
-                    "disable" -> {
-                        chatDelayEnabled = false
-                        sender.sendMessage("已禁用消息延迟".withPluginPrefix())
-                    }
-
-                    "set" -> {
-                        chatDelay = args.getOrNull(2)?.toIntOrNull()?.coerceIn(1..300) ?: return false
-                        log.info("Set chat delay to $chatDelay second(s)")
-                        sender.sendMessage("已将消息延迟设置为${chatDelay}秒".withPluginPrefix())
-                    }
-
-                    else -> return false
-                }
+        val er = commands.process(sender, command, label, args)
+        when {
+            er.success -> return true
+            er.usage != null -> {
+                sender.sendMessage(er.usage)
+                return true
             }
 
             else -> return false
         }
-        return true
     }
 
     override fun onTabComplete(
@@ -122,25 +168,18 @@ class Main : JavaPlugin() {
         command: Command,
         alias: String,
         args: Array<out String>
-    ): MutableList<String>? {
-        if (args.size == 1) return mutableListOf(
-            "reload",
-            "test",
-            "ban",
-            "unban",
-            "banlist",
-            "clear",
-            "delay"
-        )
-        if (args.size == 2) {
-            return when (args[0]) {
-                "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
-                "unban" -> blacklist.values.toMutableList()
-                "delay" -> mutableListOf("info", "enable", "disable", "set")
-                else -> null
-            }
-        }
-        return null
+    ): MutableList<String> {
+        return commands.tabComplete(args)
+
+//        if (args.size == 2) {
+//            return when (args[0]) {
+//                "ban" -> server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList()
+//                "unban" -> blacklist.values.toMutableList()
+//                "delay" -> mutableListOf("info", "enable", "disable", "set")
+//                else -> null
+//            }
+//        }
+//        return null
     }
 
     private fun loadConfig() {

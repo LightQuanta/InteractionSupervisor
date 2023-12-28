@@ -103,7 +103,6 @@ class Main : JavaPlugin() {
                     chatDelayEnabled = true
                     sender.sendMessage("已启用消息延迟".withPluginPrefix())
                 }
-                tabComplete = { mutableListOf("5", "10", "20", "30", "60") }
             }
 
             command("disable") {
@@ -130,6 +129,7 @@ class Main : JavaPlugin() {
                         sender.sendMessage("消息延迟范围应设置为1-300秒！".withPluginPrefix())
                     }
                 }
+                tabComplete = { mutableListOf("5", "10", "20", "30", "60") }
             }
         }
     }

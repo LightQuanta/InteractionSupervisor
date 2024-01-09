@@ -25,14 +25,14 @@ fun String.withFullPluginPrefix() = "§7[§bInteraction§4Supervisor§7]§r\n$th
 class Main : JavaPlugin() {
 
     private val commands = buildCommand {
-        command("reload") {
+        "reload" {
             execute = { sender, _, _, _ ->
                 loadConfig()
                 sender.sendMessage("已加载${normalKeywords.size}条关键词和${regexpKeywords.size}条正则".withPluginPrefix())
             }
         }
 
-        command("test") {
+        "test" {
             execute = { sender, _, _, args ->
                 if (args.isEmpty()) {
                     sender.sendMessage("使用方法: /is test <关键词>".withFullPluginPrefix())
@@ -48,7 +48,7 @@ class Main : JavaPlugin() {
             }
         }
 
-        command("ban") {
+        "ban" {
             execute = { sender, _, _, args ->
                 if (args.isEmpty()) {
                     sender.sendMessage("用法: /is ban <玩家名>".withPluginPrefix())
@@ -64,7 +64,7 @@ class Main : JavaPlugin() {
             tabComplete = { server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList() }
         }
 
-        command("unban") {
+        "unban" {
             execute = { sender, _, _, args ->
                 if (args.isEmpty()) {
                     sender.sendMessage("用法: /is unban <玩家名>".withPluginPrefix())
@@ -80,13 +80,13 @@ class Main : JavaPlugin() {
             tabComplete = blacklist.values::toMutableList
         }
 
-        command("banlist") {
+        "banlist" {
             execute = { sender, _, _, _ ->
                 sender.sendMessage("封禁玩家列表：${blacklist.values.joinToString()}".withPluginPrefix())
             }
         }
 
-        command("clear") {
+        "clear" {
             execute = { sender, _, _, _ ->
                 if (chatDelayEnabled) {
                     sender.sendMessage("已清空${ChatHandler.clearDelayedMessage()}条未发送消息".withPluginPrefix())
@@ -96,29 +96,29 @@ class Main : JavaPlugin() {
             }
         }
 
-        group("delay") {
+        "delay" {
             usage = "用法：/is delay [enable|disable|status|set]".withFullPluginPrefix()
-            command("enable") {
+            "enable" {
                 execute = { sender, _, _, _ ->
                     chatDelayEnabled = true
                     sender.sendMessage("已启用消息延迟".withPluginPrefix())
                 }
             }
 
-            command("disable") {
+            "disable" {
                 execute = { sender, _, _, _ ->
                     chatDelayEnabled = false
                     sender.sendMessage("已禁用消息延迟".withPluginPrefix())
                 }
             }
 
-            command("status") {
+            "status" {
                 execute = { sender, _, _, _ ->
                     sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
                 }
             }
 
-            command("set") {
+            "set" {
                 execute = { sender, _, _, args ->
                     val delay = args.getOrNull(0)?.toIntOrNull()?.coerceIn(1..300)
                     if (delay != null) {

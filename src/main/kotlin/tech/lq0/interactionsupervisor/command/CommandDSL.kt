@@ -17,7 +17,14 @@ class CommandExecutor(private val executable: List<Command>) {
         return when {
             // 执行成功
             commandInfo.command != null -> {
-                commandInfo.command.execute?.invoke(sender, command, label, args.drop(commandInfo.depth))
+                commandInfo.command.execute?.invoke(
+                    CommandExecuteParams(
+                        sender,
+                        command,
+                        label,
+                        args.drop(commandInfo.depth)
+                    )
+                )
                 ExecuteResult(true)
             }
 
@@ -59,11 +66,30 @@ class CommandExecutor(private val executable: List<Command>) {
     }
 }
 
+data class CommandExecuteParams(
+    val sender: CommandSender,
+    val command: org.bukkit.command.Command,
+    val label: String,
+    val args: List<String>
+)
+
 class Command(val name: String) {
     val subCommands = mutableListOf<Command>()
     var usage: String? = null
     var tabComplete: (() -> MutableList<String>) = { mutableListOf() }
-    var execute: ((CommandSender, org.bukkit.command.Command, String, List<String>) -> Unit)? = null
+    var execute: ((CommandExecuteParams) -> Unit)? = null
+
+    fun tabComplete(init: () -> MutableList<String>) {
+        tabComplete = init
+    }
+
+    fun execute(init: CommandExecuteParams.() -> Unit) {
+        execute = init
+    }
+
+    fun usage(init: String) {
+        usage = init
+    }
 
     operator fun String.invoke(init: Command.() -> Unit) = Command(this).apply(init).also(subCommands::add)
 }

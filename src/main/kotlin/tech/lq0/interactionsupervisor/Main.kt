@@ -26,14 +26,14 @@ class Main : JavaPlugin() {
 
     private val commands = buildCommand {
         "reload" {
-            execute = { sender, _, _, _ ->
+            execute {
                 loadConfig()
                 sender.sendMessage("已加载${normalKeywords.size}条关键词和${regexpKeywords.size}条正则".withPluginPrefix())
             }
         }
 
         "test" {
-            execute = { sender, _, _, args ->
+            execute {
                 if (args.isEmpty()) {
                     sender.sendMessage("使用方法: /is test <关键词>".withFullPluginPrefix())
                 } else {
@@ -49,7 +49,7 @@ class Main : JavaPlugin() {
         }
 
         "ban" {
-            execute = { sender, _, _, args ->
+            execute {
                 if (args.isEmpty()) {
                     sender.sendMessage("用法: /is ban <玩家名>".withPluginPrefix())
                 } else {
@@ -61,11 +61,11 @@ class Main : JavaPlugin() {
                     } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
                 }
             }
-            tabComplete = { server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList() }
+            tabComplete { server.onlinePlayers.map { it.name }.filter { it !in blacklist.values }.toMutableList() }
         }
 
         "unban" {
-            execute = { sender, _, _, args ->
+            execute {
                 if (args.isEmpty()) {
                     sender.sendMessage("用法: /is unban <玩家名>".withPluginPrefix())
                 } else {
@@ -77,17 +77,17 @@ class Main : JavaPlugin() {
                     } ?: sender.sendMessage("未找到玩家${args[1]}！".withPluginPrefix())
                 }
             }
-            tabComplete = blacklist.values::toMutableList
+            tabComplete(blacklist.values::toMutableList)
         }
 
         "banlist" {
-            execute = { sender, _, _, _ ->
+            execute {
                 sender.sendMessage("封禁玩家列表：${blacklist.values.joinToString()}".withPluginPrefix())
             }
         }
 
         "clear" {
-            execute = { sender, _, _, _ ->
+            execute {
                 if (chatDelayEnabled) {
                     sender.sendMessage("已清空${ChatHandler.clearDelayedMessage()}条未发送消息".withPluginPrefix())
                 } else {
@@ -97,29 +97,29 @@ class Main : JavaPlugin() {
         }
 
         "delay" {
-            usage = "用法：/is delay [enable|disable|status|set]".withFullPluginPrefix()
+            usage("用法：/is delay [enable|disable|status|set]".withFullPluginPrefix())
             "enable" {
-                execute = { sender, _, _, _ ->
+                execute {
                     chatDelayEnabled = true
                     sender.sendMessage("已启用消息延迟".withPluginPrefix())
                 }
             }
 
             "disable" {
-                execute = { sender, _, _, _ ->
+                execute {
                     chatDelayEnabled = false
                     sender.sendMessage("已禁用消息延迟".withPluginPrefix())
                 }
             }
 
             "status" {
-                execute = { sender, _, _, _ ->
+                execute {
                     sender.sendMessage((if (chatDelayEnabled) "消息延迟已启用" else "消息延迟未启用").withPluginPrefix() + "，当前延迟为${chatDelay}秒")
                 }
             }
 
             "set" {
-                execute = { sender, _, _, args ->
+                execute {
                     val delay = args.getOrNull(0)?.toIntOrNull()?.coerceIn(1..300)
                     if (delay != null) {
                         chatDelay = delay
@@ -129,7 +129,7 @@ class Main : JavaPlugin() {
                         sender.sendMessage("消息延迟范围应设置为1-300秒！".withPluginPrefix())
                     }
                 }
-                tabComplete = { mutableListOf("5", "10", "20", "30", "60") }
+                tabComplete { mutableListOf("5", "10", "20", "30", "60") }
             }
         }
     }
